@@ -183,4 +183,17 @@ describe Generation do
       expect(certificate.certificate_quantities.count).to eq(1)
     end
   end
+
+  describe 'certificate association' do
+    let(:generator) { create(:generator) }
+
+    it 'enforces one certificate per generation' do
+      generation = create(:generation, generator: generator)
+
+      expect(generation.certificate).to be_present
+
+      second_cert = build(:certificate, generation: generation)
+      expect { second_cert.save! }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+  end
 end
