@@ -116,4 +116,25 @@ RSpec.describe 'Generations', type: :request do
       end
     end
   end
+
+  context "when creating a generation that overlaps with an existing generation" do
+    let(:create_generator) { create(:generator, organization: organization) }
+    let!(:existing_generation) { create(:generation, generator: create_generator, quantity: 100, start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 31)) }
+    let(:body) {
+      {
+        'start_date'  => Date.new(2025, 1, 15),
+        'end_date' => Date.new(2025, 1, 28),
+        'quantity' => 80,
+        'generator_id' => create_generator.id
+      }
+    }
+
+    it 'returns an unprocessable entity error' do
+      post '/generations', headers: headers, params: body.to_json
+      expect(response.code).to eq('422')
+      json = JSON.parse(response.body)
+      expect(json['errors']).to include("generation dates overlap with existing generation")
+      expect(json['errors']).to include("generation must be contiguous with an existing generation")
+    end
+  end
 end
