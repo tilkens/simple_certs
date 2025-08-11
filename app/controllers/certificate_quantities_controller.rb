@@ -96,23 +96,17 @@ class CertificateQuantitiesController < ApplicationController
     @certificate_quantity = CertificateQuantity.find(params[:id])
     authorize @certificate_quantity
 
-    unless @certificate_quantity.status == "active"
-      return head :unprocessable_entity
+    quantity = params[:quantity].to_i
+
+    ActiveRecord::Base.transaction do
+      @certificate_quantity.split(quantity)
+      @certificate_quantity.reload
+      render "show"
     end
-
-    quantity = params[:quantity]
-    unless /^\d+$/.match(quantity.to_s)
-      return head :unprocessable_entity
-    end
-
-    quantity = quantity.to_i
-    if quantity >= @certificate_quantity.quantity
-      return head :unprocessable_entity
-    end
-
-    @certificate_quantity.split(params[:quantity].to_i)
-
-    @certificate_quantity.reload
-    render "show"
+  rescue Pundit::NotAuthorizedError => e
+    head :unauthorized
+  rescue StandardError => e
+    @errors = OpenStruct.new(full_messages: [e.message])
+    render "errors", status: :unprocessable_entity
   end
 end
