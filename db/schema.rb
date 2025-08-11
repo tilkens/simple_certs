@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_01_025252) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_10_215107) do
   create_table "accounts", force: :cascade do |t|
     t.string "name"
     t.integer "organization_id"
@@ -34,7 +34,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_01_025252) do
     t.integer "generation_id"
     t.integer "generator_id"
     t.date "vintage_date"
-    t.index ["generation_id"], name: "index_certificates_on_generation_id"
+    t.index ["generation_id"], name: "index_certificates_on_generation_id", unique: true
     t.index ["generator_id"], name: "index_certificates_on_generator_id"
   end
 
