@@ -106,7 +106,7 @@ class CertificateQuantitiesController < ApplicationController
   rescue Pundit::NotAuthorizedError => e
     head :unauthorized
   rescue StandardError => e
-    @errors = OpenStruct.new(full_messages: [e.message])
+    @errors = OpenStruct.new(full_messages: [ e.message ])
     render "errors", status: :unprocessable_entity
   end
 end

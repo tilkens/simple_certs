@@ -57,15 +57,11 @@ class Generation < ApplicationRecord
     existing_generations = generator.generations.where.not(id: id)
     return if existing_generations.empty?
 
-    previous_contiguous = existing_generations
-      .where("end_date = ?", start_date - 1.day)
+    connects_to_timeline = existing_generations
+      .where("end_date = ? OR start_date = ?", start_date - 1.day, end_date + 1.day)
       .exists?
 
-    next_contiguous = existing_generations
-      .where("start_date = ?", end_date + 1.day)
-      .exists?
-
-    if !previous_contiguous && !next_contiguous
+    unless connects_to_timeline
       errors.add(:base, "generation must be contiguous with an existing generation")
     end
   end
