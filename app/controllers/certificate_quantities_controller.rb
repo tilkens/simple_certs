@@ -96,10 +96,8 @@ class CertificateQuantitiesController < ApplicationController
     @certificate_quantity = CertificateQuantity.find(params[:id])
     authorize @certificate_quantity
 
-    quantity = params[:quantity].to_i
-
     ActiveRecord::Base.transaction do
-      @certificate_quantity.split(quantity)
+      @certificate_quantity.split(params[:quantity])
       @certificate_quantity.reload
       render "show"
     end

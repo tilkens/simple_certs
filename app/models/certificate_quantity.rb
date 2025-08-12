@@ -7,6 +7,12 @@ class CertificateQuantity < ApplicationRecord
 
   def split(quantity)
     raise ArgumentError, "cannot split inactive certificate quantity" unless status == "active"
+
+    if quantity.is_a?(String)
+      raise ArgumentError, "quantity must be a valid positive integer" unless quantity.match?(/^\d+$/)
+      quantity = quantity.to_i
+    end
+
     raise ArgumentError, "quantity must be a positive integer" unless quantity.is_a?(Integer) && quantity > 0
     raise ArgumentError, "quantity must be less than the original quantity" unless quantity < self.quantity
 

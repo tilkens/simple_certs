@@ -378,8 +378,10 @@ RSpec.describe 'CertificateQuantities', type: :request do
 
     context "when splitting a certificate with an non-numeric quantity" do
       it 'returns a unprocessable_entity status' do
-        put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=abc", headers: headers
+        put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=99abc", headers: headers
         expect(response.code).to eq('422')
+        json = JSON.parse(response.body)
+        expect(json['errors']).to include('quantity must be a valid positive integer')
       end
     end
 
@@ -387,6 +389,8 @@ RSpec.describe 'CertificateQuantities', type: :request do
       it 'returns a unprocessable_entity status' do
         put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=1000", headers: headers
         expect(response.code).to eq('422')
+        json = JSON.parse(response.body)
+        expect(json['errors']).to include('quantity must be less than the original quantity')
       end
     end
 
@@ -394,6 +398,8 @@ RSpec.describe 'CertificateQuantities', type: :request do
       it 'returns a unprocessable_entity status' do
         put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=100", headers: headers
         expect(response.code).to eq('422')
+        json = JSON.parse(response.body)
+        expect(json['errors']).to include('quantity must be less than the original quantity')
       end
     end
 
@@ -417,21 +423,6 @@ RSpec.describe 'CertificateQuantities', type: :request do
       it 'returns an unauthorized status' do
         put "/certificate_quantities/#{other_certificate_quantity.id}/split?quantity=2", headers: headers
         expect(response.code).to eq('401')
-      end
-    end
-
-    context "when split operation fails due to validation errors" do
-      it 'returns a 422 status when split would create negative quantity' do
-        put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=150", headers: headers
-        expect(response.code).to eq('422')
-        json = JSON.parse(response.body)
-        expect(json['errors']).to include('quantity must be less than the original quantity')
-      end
-
-      it 'returns validation error messages for non-numeric input' do
-        put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=abc", headers: headers
-        json = JSON.parse(response.body)
-        expect(json['errors']).to include('quantity must be a positive integer')
       end
     end
   end
