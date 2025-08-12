@@ -50,7 +50,7 @@ describe Generation do
     end
   end
 
-  describe 'date overlap validation' do
+  describe 'date overlap and gap validations' do
     let(:generator) { create(:generator) }
     let!(:existing_generation) { create(:generation, generator: generator, start_date: Date.new(2025, 1, 1), end_date: Date.new(2025, 1, 31)) }
 
@@ -103,17 +103,17 @@ describe Generation do
         let(:start_date) { Date.new(2025, 1, 1) }
         let(:end_date) { Date.new(2025, 1, 31) }
 
-        it 'prevents generation with identical date range' do
+        it 'prevents generation' do
           expect(subject).not_to be_valid
           expect(subject.errors[:base]).to include('generation dates overlap with existing generation')
         end
       end
 
-      context 'when generation overlaps with existing generation' do
+      context 'when generation starts during but ends after existing generation' do
         let(:start_date) { Date.new(2025, 1, 15) }
         let(:end_date) { Date.new(2025, 2, 15) }
 
-        it 'prevents generation that overlaps with existing generation' do
+        it 'prevents generation' do
           expect(subject).not_to be_valid
           expect(subject.errors[:base]).to include('generation dates overlap with existing generation')
         end
@@ -123,7 +123,7 @@ describe Generation do
         let(:start_date) { Date.new(2024, 12, 15) }
         let(:end_date) { Date.new(2025, 1, 15) }
 
-        it 'prevents generation that starts before but ends during existing generation' do
+        it 'prevents generation' do
           expect(subject).not_to be_valid
           expect(subject.errors[:base]).to include('generation dates overlap with existing generation')
         end
@@ -144,6 +144,16 @@ describe Generation do
         let(:end_date) { Date.new(2025, 2, 28) }
 
         it 'prevents generation that completely contains existing generation' do
+          expect(subject).not_to be_valid
+          expect(subject.errors[:base]).to include('generation dates overlap with existing generation')
+        end
+      end
+
+      context 'when generation is completely contained within existing generation' do
+        let(:start_date) { Date.new(2025, 1, 15) }
+        let(:end_date) { Date.new(2025, 1, 25) }
+
+        it 'prevents generation' do
           expect(subject).not_to be_valid
           expect(subject.errors[:base]).to include('generation dates overlap with existing generation')
         end
