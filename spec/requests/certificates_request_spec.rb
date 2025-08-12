@@ -52,7 +52,6 @@ RSpec.describe 'Certificates', type: :request do
 
   context 'show' do
     context "when accessing certificate that is associated with user's organization" do
-      let!(:certificate) { create(:certificate, generator: generator, generation: generation) }
       it 'returns a certificate' do
         get "/certificates/#{certificate.id}", headers: headers
         json = JSON.parse(response.body)
@@ -61,9 +60,8 @@ RSpec.describe 'Certificates', type: :request do
     end
 
     context "when accessing certificate that is not associated with user's organization" do
-      let!(:certificate) { create(:certificate, generator: other_generator, generation: other_generation) }
       it 'returns an unauthorized status' do
-        get "/certificates/#{certificate.id}", headers: headers
+        get "/certificates/#{other_certificate.id}", headers: headers
         expect(response.code).to eq('401')
       end
     end

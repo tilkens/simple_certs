@@ -17,7 +17,7 @@ RSpec.describe 'CertificateQuantities', type: :request do
   let(:other_certificate) { other_generation.certificate }
   let(:certificate_quantity) { certificate.reload.certificate_quantities.first }
   let(:other_certificate_quantity) { other_certificate.reload.certificate_quantities.first }
-  let(:generation_in_transit) { create(:generation, generator: other_generator) }
+  let(:generation_in_transit) { create(:generation, generator: other_generator, start_date: Date.new(2025, 2, 1), end_date: Date.new(2025, 2, 28)) }
   let(:certificate_in_transit) { generation_in_transit.certificate }
   let(:certificate_quantity_in_transit) { certificate_in_transit.certificate_quantities.first }
 
@@ -378,8 +378,10 @@ RSpec.describe 'CertificateQuantities', type: :request do
 
     context "when splitting a certificate with an non-numeric quantity" do
       it 'returns a unprocessable_entity status' do
-        put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=abc", headers: headers
+        put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=99abc", headers: headers
         expect(response.code).to eq('422')
+        json = JSON.parse(response.body)
+        expect(json['errors']).to include('quantity must be a valid positive integer')
       end
     end
 
@@ -387,6 +389,8 @@ RSpec.describe 'CertificateQuantities', type: :request do
       it 'returns a unprocessable_entity status' do
         put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=1000", headers: headers
         expect(response.code).to eq('422')
+        json = JSON.parse(response.body)
+        expect(json['errors']).to include('quantity must be less than the original quantity')
       end
     end
 
@@ -394,6 +398,8 @@ RSpec.describe 'CertificateQuantities', type: :request do
       it 'returns a unprocessable_entity status' do
         put "/certificate_quantities/#{certificate_quantity.id}/split?quantity=100", headers: headers
         expect(response.code).to eq('422')
+        json = JSON.parse(response.body)
+        expect(json['errors']).to include('quantity must be less than the original quantity')
       end
     end
 

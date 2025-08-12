@@ -21,7 +21,7 @@ class GenerationsController < ApplicationController
       render "show", status: :created
     else
       @errors = @generation.errors
-      render "errors"
+      render "errors", status: :unprocessable_entity
     end
   end
 

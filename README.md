@@ -26,10 +26,10 @@ currency. This accounting system allows consumers of electricity to cover their 
 purchasing RECs in this market in the same amount as they consume. Our system allows an 
 organization to proclaim that they run on 100% renweable energy if they purchase enough 
 RECs to cover their consumption. The process of claiming RECs to cover one's 
-usage is called retirement, which means to take REC's out of ciruculation so that no one else 
+usage is called retirement, which means to take REC's out of circulation so that no one else 
 can claim them. The most important attribute of this system is its integrity. Just like a
 bank, we can't afford to lose RECs or let accounts become unbalanced. Production (reported
-generation) must match consumnption (retirements).
+generation) must match consumption (retirements).
 
 ## App overview
 
